@@ -1,4 +1,6 @@
 using PlanetSim.App.Selection;
+using PlanetSim.App.Trails;
+using PlanetSim.Core.Math;
 using PlanetSim.Core.Model;
 using PlanetSim.Core.Physics;
 
@@ -9,6 +11,7 @@ public sealed class SimulationController
     private readonly ISimulationEngine _engine;
     private readonly int _maxStepsPerFrame;
     private readonly SelectionState _selection = new();
+    private readonly TrailRecorder _trailRecorder = new(TimeSpan.FromHours(6), 8_192);
     private double _accumulatedSimulatedSeconds;
     private TimeRate _timeRate = TimeRate.FromSlider(0.5);
     private bool _isPaused;
@@ -30,6 +33,10 @@ public sealed class SimulationController
         _timeRate.SimulatedSecondsPerRealSecond, _effectiveRate,
         _selection.SelectedBody, _trailsVisible, _errorMessage);
 
+    public IReadOnlyDictionary<BodyId, IReadOnlyList<Vector3d>> TrailPositions =>
+        _trailRecorder.Trails.ToDictionary(pair => pair.Key,
+            pair => (IReadOnlyList<Vector3d>)pair.Value.Positions);
+
     public void SetSlider(double value) => _timeRate = TimeRate.FromSlider(value);
     public void TogglePause() { _isPaused = !_isPaused; _effectiveRate = 0; }
     public void Select(BodyId body) => _selection.Select(body);
@@ -50,7 +57,12 @@ public sealed class SimulationController
         try
         {
             for (; completed < steps; completed++) _engine.Step();
-            if (completed > 0) _lastValidSnapshot = _engine.CreateSnapshot();
+            if (completed > 0)
+            {
+                var previous = _lastValidSnapshot;
+                _lastValidSnapshot = _engine.CreateSnapshot();
+                _trailRecorder.Record(previous, _lastValidSnapshot);
+            }
         }
         catch (Exception exception) when (exception is InvalidOperationException or ArithmeticException)
         {
@@ -69,6 +81,7 @@ public sealed class SimulationController
         _engine.Reset();
         _lastValidSnapshot = _engine.CreateSnapshot();
         _selection.ReturnToSystemView();
+        _trailRecorder.Clear();
         _accumulatedSimulatedSeconds = 0;
         _effectiveRate = 0;
         _errorMessage = null;
