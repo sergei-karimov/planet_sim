@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/PlanetSim.App/PlanetSim.App.csproj" />
     <Project Path="src/PlanetSim.Core/PlanetSim.Core.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/PlanetSim.App.Tests/PlanetSim.App.Tests.csproj" />
     <Project Path="tests/PlanetSim.Core.Tests/PlanetSim.Core.Tests.csproj" />
   </Folder>
 </Solution>
