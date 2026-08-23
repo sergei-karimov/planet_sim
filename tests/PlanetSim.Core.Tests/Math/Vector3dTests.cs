@@ -25,4 +25,11 @@ public sealed class Vector3dTests
         Assert.Equal(new Vector3d(2.5, 5, 7.5),
             Vector3d.Lerp(Vector3d.Zero, new Vector3d(10, 20, 30), 0.25));
     }
+
+    [Fact]
+    public void CrossProducesPerpendicularVector()
+    {
+        Assert.Equal(new Vector3d(0, 0, 1),
+            Vector3d.Cross(new Vector3d(1, 0, 0), new Vector3d(0, 1, 0)));
+    }
 }
