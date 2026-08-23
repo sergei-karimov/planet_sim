@@ -1,0 +1,5 @@
+.worktrees/
+artifacts/
+**/bin/
+**/obj/
+.idea/
