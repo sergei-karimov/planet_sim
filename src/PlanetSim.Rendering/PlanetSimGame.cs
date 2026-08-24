@@ -19,7 +19,7 @@ public sealed class PlanetSimGame
 
     public void Run()
     {
-        Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.VSyncHint);
+        Raylib.SetConfigFlags(WindowConfiguration.DefaultFlags);
         Raylib.InitWindow(1280, 720, EnglishStrings.Title);
         if (!Raylib.IsWindowReady()) throw new InvalidOperationException("Raylib window initialization failed.");
         Raylib.SetTargetFPS(60);
